@@ -153,8 +153,7 @@ IENY")
 (defn main
 	"Trains a model from the examples and prints out its weights"
 	[]
-	(let [start 	{:lambda 0.0001, :step 1, :w {}, :errors 0} 
-		  examples 	(map parse (-> *in* BufferedReader. line-seq)) 
+	(let [start 	{:lambda 0.0001, :step 1, :w {}, :errors 0} 	
 		  model     (train start examples)]
 		(println (map #(str (key %) ":" (val %)) (:w model)))))
 ;; End of Legacy Pegasos Algorythym for testing
