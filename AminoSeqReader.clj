@@ -123,18 +123,6 @@ IENY")
 		  r   (/ 1 (Math/sqrt lambda))]
 		(project (add w1 (scale (* eta y) x)) r)))
 
-(defn report
-	"Prints some statistics about the given model at the specified interval"
-	[model interval]
-	(if (zero? (mod (:step model) interval))
-		(let [t      (:step model)
-		      size   (count (keys (:w model)))
-		      errors (:errors model) ]
-			(println "Step:" t 
-				 "\t Features in w =" size 
-				 "\t Errors =" errors 
-				 "\t Accuracy =" (/ (float errors) t)))))
-
 (defn update
 	"Returns an updated model by taking the last model, the next training 
 	 and applying the Pegasos update step"
@@ -145,7 +133,7 @@ IENY")
 		  errors (:errors model)
 		  error  (> (hinge-loss w example) 0)]
 		(do 
-			(report model 100)
+			
 			{ :w      (if error (correct w example t lambda) w), 
 			  :lambda lambda, 
 			  :step   (inc t), 
@@ -156,12 +144,23 @@ IENY")
 	[initial examples]
 	(reduce update initial examples))
 
-(defn main
-	"Trains a model from the examples and prints out its weights"
-	[]
-	(let [start 	{:lambda 0.0001, :step 1, :w {}, :errors 0} 	
-		  model     (train start examples)]
-		(println (map #(str (key %) ":" (val %)) (:w model)))))
-;; End of Legacy Pegasos Algorythym for testing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;End Pegasos;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn stats
+	"Returns a scatter plot of correction step against the correction "
+	[model]
+	(let [step (:step model)
+		      features   (count (keys (:w model)))
+		      errors (:errors model) 
+                      error-to-step (- 1 (/ (float errors) step))]                      
+			(make-scatter-plot  step  error-to-step "Steps" "Percentage Correct")
+                        (make-scatter-plot  step  features "Steps" "Features")))
+
+(defn show-plots []
+   (let [start {:lambda 0.0001, :step 1, :w {}, :errors 0} 
+     model (train start examples)]
+      (stats model)))
+
+
 		
 
