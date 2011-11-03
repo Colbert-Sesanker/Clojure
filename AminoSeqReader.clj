@@ -31,6 +31,47 @@
 (defn get-protein-neighbor-index [protein-neighbor] "String -> Int"
 	(protein-neighborhood protein-neighbor))
 
+(defn target-neighbors [string]
+ (let [ matches (re-seq #"..[A].." string) ]
+    matches))
+
+(defn error-neighbors [string]
+ (let [ matches (re-seq #"..[S].." string) ]
+    matches))
+
+(def l 
+"LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
+EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
+LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
+GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
+IENY")
+
+(defn make [matches]
+ [(str (nth matches 1) (nth matches 3) 1 ) (str (first matches) (last matches)  2)])
+
+(defn index-tuple [made]
+ {(get-protein-neighbor-index (first made)) 1, (get-protein-neighbor-index (second made)) 1})
+
+(def target-features 
+ (map make (target-neighbors l)))
+
+(def error-features 
+ (map make (error-neighbors l)))
+
+(def target-vectors
+ (map index-tuple target-features))
+
+(def error-vectors
+ (map index-tuple error-features))
+
+(defn pos-example [sparse]
+{:y 1 :x sparse})
+
+(defn neg-example [sparse]
+{:y -1 :x sparse})
+
+(def examples
+ (interleave (map pos-example target-vectors) (map neg-example error-vectors)))
 
 
 
