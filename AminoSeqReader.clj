@@ -1,16 +1,6 @@
 (ns machine
   (:use clojure.contrib.combinatorics)) 
 
-(zipmap (sort (map read-string
- (map #(apply str %) (cartesian-product 
-       (repeat 2 ("R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W") )
-              )))) 
-(range 0 441 1)) ;;makes indexes fom 0 to 440
-
-
-(cartesian-product 
-       (repeat 2 ["R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W"] )
-              )
 
 (clojure.core/refer 'clojure.core)
 (ns machine
