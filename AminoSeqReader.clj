@@ -1,14 +1,9 @@
-(ns machine
-  (:use clojure.contrib.combinatorics)) 
+(ns AminoSeqReader
+   (:use clojure.contrib.combinatorics)
+   (:use [incanter.charts :only ( bar-chart scatter-plot add-lines)])  
+   (:use [incanter.core :only (view)])
+   (:import (java.io FileReader BufferedReader)))  					 
 
-
-(clojure.core/refer 'clojure.core)
-(ns machine
-  (:use (java.io FileReader BufferedReader))         
-  (:use (clojure.contrib.combinatorics) )     
-  (:use (cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D))
-  (:use (cern.jet.math.tfloat FloatFunctions))
-  (:use (edu.emory.mathcs.utils ConcurrencyUtils)))
 
 ;; Supporting functions
 (defn n-tuple-list [n list] "Integer- > TupleList -> List" 
@@ -19,6 +14,17 @@
 
 (defn stringseq-tuple [tuple-list] "TupleList -> StringList"
  (map str (map first tuple-list) (map second tuple-list)))
+
+
+(defn make-scatter-plot ;; Makes a scatter plot from two lists of data
+  "x-list-> y-list -> String -> String -> ScatterPopup"
+  [x-list y-list  x-label y-label]  
+   (view
+    (scatter-plot x-list y-list
+                  :x-label x-label 
+                  :y-label y-label
+                  :legend true)))	
+
 
 ;; Mathematical functions from Mark Reid: http://mark.reid.name/sap/online-learning-in-clojure.html
 ;; Will replace with incanter libraries
