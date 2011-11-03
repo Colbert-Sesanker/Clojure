@@ -10,7 +10,7 @@
   (:use (cern.jet.math.tfloat FloatFunctions))
   (:use (edu.emory.mathcs.utils ConcurrencyUtils)))
 
-
+;; Supporting functions
 (defn n-tuple-list [n list] "Integer- > TupleList -> List" 
  (map #(nth % n) list))
 
@@ -19,6 +19,10 @@
 
 (defn stringseq-tuple [tuple-list] "TupleList -> StringList"
  (map str (map first tuple-list) (map second tuple-list)))
+
+;;
+;;Devise scheme to transform FASTA peptide sequences into a training set that can train an SVM to fill gaps
+;;in peptide sequences
 
 (def protein-neighbors 
  (let [ proteins (repeat 2 ["R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W"])]
@@ -39,7 +43,7 @@
  (let [ matches (re-seq #"..[S].." string) ]
     matches))
 
-(def l 
+(def l ;;sequence FASTA format for protein
 "LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
 EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
 LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
@@ -70,7 +74,7 @@ IENY")
 (defn neg-example [sparse]
 {:y -1 :x sparse})
 
-(def examples
+(def examples ;; examples used for training
  (interleave (map pos-example target-vectors) (map neg-example error-vectors)))
 
 
