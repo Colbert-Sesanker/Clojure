@@ -166,17 +166,17 @@
 	"Returns an updated model by taking the last model, the next training 
 	 and applying the Pegasos update step"
 	[model example]
-	(let [lambda (:lambda model)
+	(let [      lambda   (:lambda model)
 		    t        (:step   model)
 		    w        (:w      model)
-        features (count (keys (:w model)))
+                    features (count (keys (:w model)))
 		    errors   (:errors model)
 		    error    (> (hinge-loss w example) 0)]
    
 			{ :w        (if error (correct w example t lambda) w), 
 			  :lambda   lambda, 
 			  :step     (inc t), 
-        :features (into (:features model) [features])
+                          :features (into (:features model) [features])
 			  :errors   (into  errors  [(if error (inc ( last errors)) (last errors))]) } ))
 
 (defn train
@@ -193,8 +193,8 @@
 		      steps         (take (:step model) (iterate inc 1))
 		      features      (:features model)
 		      errors        (:errors model) 
-          error-to-step (map #(- 1 (/ (float %) %2)) errors steps) ]                      
-			                  (list-scatter-plot  steps  error-to-step "Steps" "Percentage Correct")
+                      error-to-step (map #(- 1 (/ (float %) %2)) errors steps) ]                      
+			(list-scatter-plot  steps  error-to-step "Steps" "Percentage Correct")
                         (list-scatter-plot  steps  features "Steps" "Features")
                         (list-scatter-plot  steps  errors "Steps" "Errors")))
 
