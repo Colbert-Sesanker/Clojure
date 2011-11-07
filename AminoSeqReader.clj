@@ -55,8 +55,9 @@
 ;;in peptide sequences
 
 (def protein-neighbors 
- (let [ proteins (repeat 2 ["R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W"])]
-	(cartesian-product (first proteins) (second proteins))))
+ (let [proteins ["R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W"]]
+	(cartesian-product proteins proteins)))
+
 
 (def protein-neighborhood (let [ s (stringseq-tuple protein-neighbors)] 
   (zipmap (into (stringseq s (repeat "1")) (stringseq s (repeat "2"))) 
@@ -70,7 +71,7 @@
     matches))
 
 (defn error-neighbors [string] ;;returns neighborhoods about undesired amino acid
- (let [ matches (re-seq #"..[S].." string) ]
+ (let [ matches (re-seq #"..[^A].." string) ]
     matches))
 
 (def l ;;sequence FASTA format for protein
@@ -124,13 +125,13 @@ MTEKARVSHLMGWNY")
  (map index-tuple error-features))
 
 (defn pos-example [sparse]
-{:y 1 :x sparse})
+ {:y 1 :x sparse})
 
 (defn neg-example [sparse]
-{:y -1 :x sparse})
+ {:y -1 :x sparse})
 
 (def examples ;; examples used for training
- (interleave (map pos-example target-vectors) (map neg-example error-vectors)))
+ (into (map pos-example target-vectors) (map neg-example error-vectors)))
 
 ;; Legacy Pegasos algorythym described by Mark Reid http://mark.reid.name/sap/online-learning-in-clojure.html
 
@@ -168,15 +169,15 @@ MTEKARVSHLMGWNY")
 	"Returns a model trained from the initial model on the given examples"
 	[initial examples]
 	(reduce update initial examples))
-
+((
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;End Pegasos;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn stats
 	"Returns a scatter plot of correction step against the correction "
 	[model]
-	(let [step (:step model)
+	(let [step (take (:step model) (iterate inc 1) )
 		      features   (count (keys (:w model)))
-		      errors (:errors model) 
+		      errors ( take (:errors model) 
                       error-to-step (- 1 (/ (float errors) step))]                      
 			(make-scatter-plot  step  error-to-step "Steps" "Percentage Correct")
                         (make-scatter-plot  step  features "Steps" "Features")))
