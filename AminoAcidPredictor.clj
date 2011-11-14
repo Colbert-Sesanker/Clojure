@@ -1,3 +1,8 @@
+;;Author: Colbert Sesanker
+;;email sesanker0@gmail.com
+;;Any Legacy material is explicitly commented as such
+
+
 (ns AminoAcidPredictor
    (:use clojure.contrib.combinatorics)
    (:use [incanter.charts :only (scatter-plot add-lines)])  
@@ -147,7 +152,9 @@
 (def examples ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
  (into (map pos-example target-vectors) (map neg-example error-vectors)))
 
-;; The following is SVM algorythym based on one described by Mark Reid http://mark.reid.name/sap/online-learning-in-clojure.html
+;; The following is SVM algorythym based on one described by Mark Reid 
+;;http://mark.reid.name/sap/online-learning-in-clojure.html 
+;;Functions hinge-loss, correct and train are from Mark's implementation
 
 (defn hinge-loss ;; Returns the hinge loss of the weight vector w on the given example
 	"model w (map) -> Training example (map) -> non-negative number   "
@@ -164,7 +171,7 @@
 
 (defn update
 	"Returns an updated model by taking the last model, the next training 
-	 and applying the Pegasos update step"
+	 and applying the Pegasos update step. Allocates errors and features indexed by each time step"
 	[model example]
 	(let [      lambda   (:lambda model)
 		    t        (:step   model)
@@ -184,7 +191,7 @@
 	[initial-model examples]
 	(reduce update initial-model examples))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;End-Pegasos;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn stats
 	"Returns a scatter plot of correction step against the percent correct "
