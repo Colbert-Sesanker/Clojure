@@ -113,12 +113,11 @@
   (let [ error-matches (re-seq #"..[^A].." string) ]
     error-matches))
 
-;;
-(comment (def l ;;sequence FASTA format for protein
-"
-"))
 
-(def l ordered-control-data )
+
+(def training-file
+
+(def l random-control-data )
 
 (defn make [matches] 
  "sequence of neighborhoods (Sring-seq) -> length 2 sequence of features in neighboorhod"
@@ -132,14 +131,28 @@
 ;;Creates a unordered sequence of features for each target neighborhood
  (map make (target-neighbors l)))
 
+(defn target-features [peptide-sequence]
+;;returns a unordered sequence of features for each target neighborhood
+ (map make (target-neighbors peptide-sequence)))
+
 (def error-features 
  (map make (error-neighbors l)))
+
+(defn error-features [peptide-sequence]
+ (map make (error-neighbors peptide-sequence)))
 
 (def target-vectors
  (map index-tuple target-features))
 
+(defn target-vectors [target-features]
+ (map index-tuple target-features))
+
 (def error-vectors
  (map index-tuple error-features))
+
+(defn error-vectors [error-features]
+ (map index-tuple error-features))
+ 
 
 (defn pos-example [sparse-vector]
  "Sparse vector, a map of key value pairs (map)-> Map assigning sparse vector to positive class (Map)"
@@ -151,6 +164,15 @@
 
 (def examples ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
  (into (map pos-example target-vectors) (map neg-example error-vectors)))
+
+(defn examples [target-vectors error-vectors]  ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
+ (into (map pos-example target-vectors) (map neg-example error-vectors))
+
+(defn read-file [file-path]  ;peptide sequence text file 
+ (reduce str (line-seq (BufferedReader. 
+           (FileReader. file-path)))))
+
+
 
 ;; The following is SVM algorythym based on one described by Mark Reid 
 ;;http://mark.reid.name/sap/online-learning-in-clojure.html 
