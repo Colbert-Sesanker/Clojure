@@ -70,26 +70,21 @@
 (def amino-acids 
   ["R" "H" "K" "D" "E" "S" "T" "N" "Q" "C" "U" "G" "P" "A" "V" "I" "L" "M" "F" "Y" "W"])  
 
-(comment
-(defn make-random-control-data [it alphabet]  ;; recursive function to make random string of length it*cardinality(alphabet) from a list of the alphabet's letters
-  {:pre [(integer? it) (not (neg? it))]} ;;returns stack overflow for large it use loop recur
-  (if (= it 1) 
-      (reduce str (shuffle alphabet))
-      (str (reduce str (shuffle alphabet)) 
-            (make-random-control-data (dec it) alphabet))))
-)
+(defn random [repeats name]
+ {:pre [(integer? repeats) (string? name)]}
+ (binding [*out* (java.io.FileWriter. name)]
+          (prn (apply str (repeatedly (int repeats) #(apply str (shuffle amino-acids)))))))
 
-(defn make-random-control-data [num alphabet]
-  (apply str (repeatedly num #(apply str (shuffle alphabet)))))
-
-(def random-control-data
-     (make-random-control-data (int 1000) amino-acids))
-
-(defn make-ordered-control-data [i seed]
-    (reduce str (into [] (repeat i seed))))
-
-(def ordered-control-data 
-    (make-ordered-control-data (int 10000) "KIALK" ))  
+(defn ordered 
+ ([repeats seed name]    
+ {:pre [(integer? repeats) (string? seed) (string? name)]}
+ (binding [*out* (java.io.FileWriter. name)]
+          (prn (reduce str (into [] (repeat (int repeats) seed ))))))
+ ;;overload when seed is not provided
+ ([repeats name]   
+ {:pre [(integer? repeats) (string? name)]}
+ (binding [*out* (java.io.FileWriter. name)]
+          (prn (reduce str (into [] (repeat (int repeats) "KIALK")))))))
 
 (def protein-neighbors ;;  
 	 (cartesian-product amino-acids amino-acids))
@@ -113,46 +108,26 @@
   (let [ error-matches (re-seq #"..[^A].." string) ]
     error-matches))
 
-
-
-(def training-file
-
-(def l random-control-data )
-
 (defn make [matches] 
  "sequence of neighborhoods (Sring-seq) -> length 2 sequence of features in neighboorhod"
  [(str (nth matches 1) (nth matches 3) 1 ) (str (first matches) (last matches)  2)])
 
 (defn index-tuple [made]
- "sequence of neighborhoods (Sring-seq) -> length 2 sequence of features in neighboorhod"
+;;Feature Vector -> sparse vector with unit value
  {(get-protein-neighbor-index (first made)) 1, (get-protein-neighbor-index (second made)) 1})
-
-(def target-features 
-;;Creates a unordered sequence of features for each target neighborhood
- (map make (target-neighbors l)))
 
 (defn target-features [peptide-sequence]
 ;;returns a unordered sequence of features for each target neighborhood
  (map make (target-neighbors peptide-sequence)))
 
-(def error-features 
- (map make (error-neighbors l)))
-
 (defn error-features [peptide-sequence]
  (map make (error-neighbors peptide-sequence)))
-
-(def target-vectors
- (map index-tuple target-features))
 
 (defn target-vectors [target-features]
  (map index-tuple target-features))
 
-(def error-vectors
- (map index-tuple error-features))
-
 (defn error-vectors [error-features]
- (map index-tuple error-features))
- 
+ (map index-tuple error-features)) 
 
 (defn pos-example [sparse-vector]
  "Sparse vector, a map of key value pairs (map)-> Map assigning sparse vector to positive class (Map)"
@@ -161,17 +136,15 @@
 (defn neg-example [sparse-vector]
  "Sparse vector, a map of key value pairs (map)-> Map assigning sparse vector to positive class (Map)"
   {:y -1 :x sparse-vector})
-
-(def examples ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
+ 
+(defn examples [target-vectors error-vectors] ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
  (into (map pos-example target-vectors) (map neg-example error-vectors)))
 
-(defn examples [target-vectors error-vectors]  ;; A map of examples used for training the model in {:y sgn :x sparse vector} format
- (into (map pos-example target-vectors) (map neg-example error-vectors))
-
-(defn read-file [file-path]  ;peptide sequence text file 
- (reduce str (line-seq (BufferedReader. 
-           (FileReader. file-path)))))
-
+(defn read-file [file-path]  ;;reads a peptide sequence text file and turns it into training data
+ (let [file    (reduce str (line-seq (BufferedReader. (FileReader. file-path))))
+       targets (target-vectors (target-features file))
+       errors  (error-vectors (error-features file))]
+       	       (examples targets errors)))         
 
 
 ;; The following is SVM algorythym based on one described by Mark Reid 
@@ -227,8 +200,9 @@
                         (list-scatter-plot  steps  features "Steps" "Features")
                         (list-scatter-plot  steps  errors "Steps" "Errors")))
 
-(defn show-plots []
+(defn show-plots [file-path]
    (let [start {:lambda 0.0001, :step 1, :w {}, :features [0], :errors [0]} 
+     examples (read-file file-path)
      model (train start examples)]
       (stats model)))
 
