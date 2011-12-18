@@ -212,11 +212,11 @@
 	"folding step to train the model"
 	[model example]
 	(let [ t        (:step   model)
-		     w        (:w      model)             
-			   fix      (> (hinge-loss w example) 0) ]
+	       w        (:w      model)             
+	       fix      (> (hinge-loss w example) 0) ]
    
-			   { :w        (if fix (correct w example t 0.0001) w),			  
-			     :step     (inc t)}))
+	       { :w     (if fix (correct w example t 0.0001) w),			  
+	         :step     (inc t)}))
 
 (defn train
 	"Returns a model trained from the initial model on the given examples"
@@ -274,7 +274,7 @@
 (defn stats
 	"Returns a scatter plot of correction step against the percent correct "
 	[model]
-	(let [	last-step     (:step model) ;;fit model here and measure curvature
+	(let [	      last-step     (:step model) ;;fit model here and measure curvature
 		      steps         (take (:step model) (iterate inc 1))
 		      features      (:features model)
 		      errors        (:errors model) 
