@@ -9,7 +9,7 @@
 ;; 1. solution-sequence: reports the most likely amino-acids to fill the gaps, trains on example sequence files
 ;;    input: [example-sequence-file test-sequence-file]
 ;;    output:[sequence of proposed amino-acids to fill gaps] May return multiple solutions per gap. In this case, the
-;;    propsed solutions are ordered by the projection (inner-product) of their respective models onto the feature vector 
+;;    proposed solutions are ordered by the projection (inner-product) of their respective models onto the feature vector 
 ;;    representative of the gap. 
 
 ;; 2. show-plots: graphs learning statistics for a given amino acid using Incanter
@@ -48,7 +48,7 @@
           (prn (apply str (repeatedly (int repeats) #(apply str (shuffle amino-acids)))))))
 
 
-(defn order [repeats seed-vector name]                          ;; interleaves and shuffles neigborhoods to always associate 
+(defn order [repeats seed-vector name]                          ;; interleaves and shuffles neighborhoods to always associate 
  {:pre [(integer? repeats) (string? name) (vector? seed-vector)]} ;; the same features about amino-acids
  (binding [*out* (java.io.FileWriter. name)]
           (prn (apply str (repeatedly (int repeats) #(apply str (shuffle seed-vector)))))))
@@ -109,14 +109,14 @@
   (protein-neighborhood protein-neighbor))
 
 (defn neighborhood-seq
-  "Peptide Sequce (String) -> Neighborhoods "
+  "Peptide Sequence (String) -> Neighborhoods "
   [protein target]   ;; returns length 5 neighborhood about target
   (let [ target-regex (reduce str [".." "[" target "]" ".."])
 	 neighborhood-sequence (re-seq (re-pattern target-regex) protein)]
          neighborhood-sequence))
 
 (defn make [matches] ;; extract inner and outer neighbors from the neighborhood
- "sequence of neighborhoods (Sring-seq) -> length 2 sequence of features in neighboorhod"
+ "sequence of neighborhoods (String-seq) -> length 2 sequence of features in neighborhood"
  [(str (nth matches 1) (nth matches 3) 1 ) (str (first matches) (last matches)  2)])
 
 (defn index-tuple [made]                          ;; return length 2 sparse vector with two nonzero values 
@@ -124,15 +124,15 @@
  {(get-protein-neighbor-index (first made)) 1, (get-protein-neighbor-index (second made)) 1})
 
 (defn sparse-vec-seq [neighborhood-seq]   ;; returns sequence of sparse vectors
-  "neighborhood-sequence (seq string) -> sparse-vector-sequece (seq {}) "
+  "neighborhood-sequence (seq string) -> sparse-vector-sequence (seq {}) "
  (map (comp index-tuple make) neighborhood-seq))
 
 (defn target-vectors [amino-acid protein]
-  "amino-acid (char) -> protein (string) -> sparse-vector-sequece (seq {})"
+  "amino-acid (char) -> protein (string) -> sparse-vector-sequence (seq {})"
  (sparse-vec-seq (neighborhood-seq protein amino-acid)))
 
 (defn error-vectors [amino-acid protein]
-   "amino-acid (char) -> protein (string) -> sparse-vector-sequece (seq {})"
+   "amino-acid (char) -> protein (string) -> sparse-vector-sequence (seq {})"
  (sparse-vec-seq (neighborhood-seq protein (str "^" amino-acid))))
 
 (defn pos-example [sparse-vector]
@@ -144,7 +144,7 @@
   {:y -1 :x sparse-vector})
  
 (defn examples [target-vectors error-vectors] ;; A sequence of examples used for training the model in {:y sgn :x sparse vector} format
- (into (map pos-example target-vectors) (map neg-example error-vectors))) ;;examples are unordered and inpedendent of ech other
+ (into (map pos-example target-vectors) (map neg-example error-vectors))) ;;examples are unordered and independent of each other
 
 (defn read-file [file-path]
  "File Path (string) - > file (string)"
@@ -157,7 +157,7 @@
   (let [ protein        (read-file protein-file-path)
          targets-matrix (into [] (map #(target-vectors % protein) amino-acids)) ;;returns matrix of examples for all amino-acids
          errors-matrix  (into [] (map #(error-vectors % protein) amino-acids))
-         example-matrix (into [] (map #(examples % %2) targets-matrix errors-matrix)) ];;Speciffy data to get out                                        
+         example-matrix (into [] (map #(examples % %2) targets-matrix errors-matrix)) ];;Specify data to get out                                        
                           example-matrix)) ;;vector of examples ordered in the same way as the amino acids
  
         ;;overload: if amino-acid is specified return examples for that amino-acid               
@@ -172,13 +172,13 @@
 
 (defn amino-acid-hinge ;; 
  [amino-acid w example] 
- "amino-acid (string) -> model (map) -> amino-acid or "" " ;; projecion should be greater than or equal to one 
+ "amino-acid (string) -> model (map) -> amino-acid or "" " ;; projection should be greater than or equal to one 
  (let [ projection  (inner w example)]                     ;; for positive examples
 	 (if (<= 1 projection) amino-acid "")))                  ;; return amino-acid, empty string otherwise
  
 (defn projection-map ;; 
  [amino-acid w example] 
- "amino-acid (string) -> model (map) -> {} or nil " ;; projecion should be greater than or equal to one 
+ "amino-acid (string) -> model (map) -> {} or nil " ;; projection should be greater than or equal to one 
  (let [ projection  (inner w example)]            ;; if (projection => 1) store in map
 	 (if (<= 1 projection) {amino-acid projection} nil)))                ;; sort by the projection
 
@@ -191,7 +191,7 @@
    (map #(amino-acid-hinge amino-acid model %) test-data))  
 
 
-;;The following is an SVM algorythym inspired by one described by Mark Reid 
+;;The following is an SVM algorithm inspired by one described by Mark Reid 
 ;;
 ;;Functions hinge-loss and correct are from Mark Reid. See: http://mark.reid.name/sap/online-learning-in-clojure.html 
 
