@@ -8,23 +8,24 @@ The two main functions are:
                                            (com-pare "A" "B" "C" "D")  
   Enter the three arguments as paths to plain text files with peptide sequences 
 
-  Inputs:
+  '''Inputs:'''
 
    * `"A"` : Path to protein used to train the classifier.  
    * `"B"` : Path to protein with gaps to test.  
    * `"C"` : Path to the same protein as argument `"B"` without any gaps. Used to score the accuracy of the classifier
 
-   Output:
+   '''Output:'''
 
    * `"D"` : Name of output file. Outputs the result in the current directory.
   
-  Try:                     
+  To execute:                     
        
-                                   (com-pare "order.txt" "orderX.txt" "order.txt") 
-                                 
-                                    
+                             (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") 
 
-  Generate these files using the procedure below. 
+                                 
+                                     
+
+  Generate `"order.txt" "orderX.txt" "order.txt"` using the procedure below. 
     
   Notice the files `"A"` and `"C"` are the same. This means the file used to train the classifier is the 
   same as the one used to score it. Since this data is artificially generated, the model should find 
