@@ -18,7 +18,8 @@ The two main functions are:
 
    * `"D"` : Name of output file. Outputs the result in the current directory.
   
-  Try:                            
+  Try:                     
+       
                                    (com-pare "order.txt" "orderX.txt" "order.txt") 
                                  
                                     
@@ -97,6 +98,7 @@ The two main functions are:
 
 
  and compare to: 
+
                                                     (show-plots "G" "order.txt")
 
 
