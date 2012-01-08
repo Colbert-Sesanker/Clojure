@@ -8,13 +8,13 @@ The two main functions are:
                                            (com-pare "A" "B" "C" "D")  
   Enter the three arguments as paths to plain text files with peptide sequences 
 
-  '''Inputs:'''
+  Inputs:
 
    * `"A"` : Path to protein used to train the classifier.  
    * `"B"` : Path to protein with gaps to test.  
    * `"C"` : Path to the same protein as argument `"B"` without any gaps. Used to score the accuracy of the classifier
 
-   '''Output:'''
+  Output:
 
    * `"D"` : Name of output file. Outputs the result in the current directory.
   
