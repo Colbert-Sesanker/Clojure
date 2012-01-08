@@ -1,28 +1,34 @@
 #Amino Acid Predictor:
-
  
- Start a REPL, load in name-space and functions. 
- The main functions are:
+ Start a REPL then load in the namespace and functions. 
+ 
+The two main functions are:
 
-#1. (com-pare "A" "B" "C" "D")  
+#1.  
+                                           (com-pare "A" "B" "C" "D")  
   Enter the three arguments as paths to plain text files with peptide sequences 
   Inputs:
-  "A" : Path to protein used to train the classifier.  
-  "B" : Path to protein with gaps to test.  
-  "C" : Path to the same protein as argument "B" without any gaps. Used to score the accuracy of the classifier
+  * "A" : Path to protein used to train the classifier.  
+  * "B" : Path to protein with gaps to test.  
+  * "C" : Path to the same protein as argument "B" without any gaps. Used to score the accuracy of the classifier
    Output:
-  "D" : Name of output file. Outputs result in the current directory.
+  * "D" : Name of output file. Outputs the result in the current directory.
   
-   Try: (com-pare "order.txt" "orderX.txt" "order.txt")  
-    Generate these files using the procedure below. Notice the files "A" and "C" are the same.
+  Try: 
+                                 (com-pare "order.txt" "orderX.txt" "order.txt")  
+
+  Generate these files using the procedure below. 
     
-    This means the file used to train the classifier is the same as the one used to score it.
-    Since this data is artificially generated, the model should find patterns in the data, and it does.
-    To generate this data in the REPL type (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")       
-    The order-protein function shuffles the three 5-letter chunks, "LRKDC" "YDEST" "ESGPI", concatenates them,
-    shuffles them again, concatenates them to the previous and so on 100 times. This yields a string of
-    1500 characters written out as plain text to the file order.txt, in the current directory.
-    To generate orderX.txt simply replace any 4 Gs with X in order.txt using a find/replace in any text editor.
+  Notice the files "A" and "C" are the same. This means the file used to train the classifier is the 
+  same as the one used to score it. Since this data is artificially generated, the model should find 
+  patterns in the data, and it does.  To generate this data in the REPL type:
+
+                            (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")       
+
+  The order-protein function shuffles the three 5-letter chunks, "LRKDC" "YDEST" "ESGPI", concatenates them,
+  shuffles them again, concatenates them to the previous and so on 100 times. This yields a string of
+  1500 characters written out as plain text to the file order.txt, in the current directory.
+  To generate orderX.txt simply replace any 4 Gs with X in order.txt using a find/replace in any text editor.
     
   To understand why the classifier works so well on the order.txt data it is necessary to understand 
   the classification process: When com-pare takes in a training peptide sequence, "A", it breaks it up into
@@ -36,7 +42,7 @@
   (21^2)*4 + 21*4 = 1848 possible features for each example. The hash-map, protein-neighborhood, associates
   each of the possible features with a unique index using the following language for the features:
 
-  (1)        AD, BC, A, D, B, C, AB, CD = AD02, BC01, 1A, D2, 1B, C1, 1AB, CD1
+                       AD, BC, A, D, B, C, AB, CD  =  AD02, BC01, 1A, D2, 1B, C1, 1AB, CD1 (1)
 
   The features of the hash-map are in the form on the RHS of (1) and two element combinations are computed 
   using the cartesian product in clojure.contrib.combinatorics. The hash-map, protein-neighborhood
@@ -54,18 +60,31 @@
   elements. N is the number of X's in "B". The first element is always the overall score, correct/total, 
   how many X's were guessed correctly based on file "C". The rest of the ordered elements correspond to the Xs in file "B"  
   the ith element of the sequence in "D" corresponds to the ith X in file "B", indexed from left to right. Create an example
-  output "D" by typing: (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") in the REPL. out.txt reads:
+  output "D" by typing: 
+                           (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") 
 
-             ([:score 1] [\G "TG"] [\G "TG"] [\G "TG"] [\G "TG"])
+  in the REPL. out.txt reads:
+
+                           ([:score 1] [\G "TG"] [\G "TG"] [\G "TG"] [\G "TG"])
 
   For each element after the score in the form [a b], a corresponds to the actual value of the gap and b is an 
   ordered sting, ordered from RIGHT TO LEFT of guesses for the gap  In the case of [\G "TG"], \G means G is the
   actual value and "TG" means G is the most likely guess and T is the second likely guess. 
       
 
- #2. show-plots: graphs learning statistics for a given amino acid using Incanter
-  try  (show-plots "A" "Anole.txt") and compare to (show-plots "A" "order.txt")
-    after making ordered data via (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")  
+#2. 
+                                         (show-plots "A" "B")
+
+  * "A": The amino acid whose learning statistics will display
+  * "B": The learning statistics graphs learning statistics for a given amino acid using Incanter
+
+  try:  
+                                     (show-plots "A" "Anole.txt") 
+  and compare to: 
+                                     (show-plots "G" "order.txt")
+
+ after making ordered data via: 
+                           (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")  
   
  The vector of models, model-matrix, (a vector of vectors) transforms the binary classification problem into 
  a 21 classifier problem. Notice the training of the models is intrinsically parallel.
