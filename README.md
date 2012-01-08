@@ -7,15 +7,21 @@ The two main functions are:
 #1.  
                                            (com-pare "A" "B" "C" "D")  
   Enter the three arguments as paths to plain text files with peptide sequences 
+
   Inputs:
+
    * `"A"` : Path to protein used to train the classifier.  
    * `"B"` : Path to protein with gaps to test.  
    * `"C"` : Path to the same protein as argument `"B"` without any gaps. Used to score the accuracy of the classifier
+
    Output:
+
    * `"D"` : Name of output file. Outputs the result in the current directory.
   
-  Try: 
-                                 (com-pare "order.txt" "orderX.txt" "order.txt")  
+  Try:                            
+                                   (com-pare "order.txt" "orderX.txt" "order.txt") 
+                                 
+                                    
 
   Generate these files using the procedure below. 
     
@@ -37,20 +43,23 @@ The two main functions are:
   In general, `XX?XX` belongs to the `?-class`, where `X` is any amino acid. 
   Each `?-class` is a set of training examples that trains the `?-model` to guess `?` from the four surrounding
   amino acids. For example, an `A-class` could be `{KLASG MNART}` where `KLASG` and `MNART` are examples for `A`.
-  The features for each example `AB?CD`, where `A,B,C,D` do are NOT amino acid abbreviations, but are any amino acids.
+  The features for each example `AB?CD`, where `A,B,C,D` are any amino acids and NOT amino acid abbreviations,
   are: `AD, BC, A, D, B, C, AB and CD`. Since any of `A, B, C and D` can have 21 values, they are
   `(21^2)*4 + 21*4 = 1848` possible features for each example. The hash-map, protein-neighborhood, associates
   each of the possible features with a unique index using the following language for the features:
 
-                       AD, BC, A, D, B, C, AB, CD  =  AD02, BC01, 1A, D2, 1B, C1, 1AB, CD1 (1)
+                       (AD, BC, A, D, B, C, AB, CD)  -->  (AD02, BC01, 1A, D2, 1B, C1, 1AB, CD1) (1)
 
   The features of the hash-map are in the form on the RHS of `(1)` and two element combinations are computed 
-  using the cartesian product in clojure.contrib.combinatorics. The hash-map, protein-neighborhood
+  using the cartesian product in `clojure.contrib.combinatorics`. The hash-map, protein-neighborhood
   has 1848 key value pairs in the form: 
-                                 {AL01 33, 2D 66, 1LL 1330, R2 1847, ...} 
+                                        {AL01 33, 2D 66, 1LL 1330, R2 1847, ...} 
+
   where the pairs are unordered.The a sparse feature vector in `R^1848` is constructed from each example. 
   The operations are defined  so only non zero values need to appear. A feature vector could be:
-                           {66 1, 44 1, 1010 1, 33 1, 3939 1, 0 1, 99 1, 2333 1} 
+
+                                   {66 1, 44 1, 1010 1, 33 1, 3939 1, 0 1, 99 1, 2333 1} 
+
   They are always 8 non-zero entries in each feature vectorsince 8 possible features can be extracted for each example. 
   Notice the values are always 1, atypical of SVMs.
 
@@ -63,11 +72,11 @@ The two main functions are:
   how many X's were guessed correctly based on file `"C"`. The rest of the ordered elements correspond to the Xs in file `"B"`  
   the ith element of the sequence in `"D"` corresponds to the ith X in file `"B"`, indexed from left to right. Create an example
   output `"D"` by typing: 
-                           (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") 
+                                   (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") 
 
   in the REPL. `out.txt` reads:
 
-                           ([:score 1] [\G "TG"] [\G "TG"] [\G "TG"] [\G "TG"])
+                                       ([:score 1] [\G "TG"] [\G "TG"] [\G "TG"] [\G "TG"])
 
   For each element after the score in the form `[a b]`, `a` corresponds to the actual value of the gap and `b` is an 
   ordered sting, ordered from RIGHT TO LEFT of guesses for the gap  In the case of `[\G "TG"]`, `\G` means `G` is the
@@ -75,18 +84,19 @@ The two main functions are:
       
 
 #2. 
-                                         (show-plots "A" "B")
+                                                       (show-plots "A" "B")
 
   * `"A"`: The amino acid whose learning statistics will display
   * `"B"`: The learning statistics graphs for a given amino acid using Incanter
 
   try:  
-                                     (show-plots "A" "Anole.txt") 
-  and compare to: 
-                                     (show-plots "G" "order.txt")
+                                                    (show-plots "A" "Anole.txt") 
+
+ and compare to: 
+                                                    (show-plots "G" "order.txt")
 
  after making ordered data via: 
-                           (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")  
+                                        (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")  
   
  The vector of models, model-matrix, (a vector of vectors) transforms the binary classification problem into 
  a 21 classifier problem. Notice the training of the models is intrinsically parallel.
@@ -96,7 +106,6 @@ The two main functions are:
  Overall, This project does exactly what it's designed to, but real protein sequences are not uniformly
  structured locally in five piece chunks. Nonetheless, it introduces a general way to define features and
  many of the ideas and code are reusable to solve other problems.
-
 
 
 
