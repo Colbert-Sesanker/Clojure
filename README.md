@@ -2,7 +2,7 @@
  
  Start a REPL then load in the namespace and functions. 
  
-The two main functions are:
+##The two main functions are:
 
 #1.  
                                            (com-pare "A" "B" "C" "D")  
