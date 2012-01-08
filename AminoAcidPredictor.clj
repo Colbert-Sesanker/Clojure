@@ -196,7 +196,7 @@
   [protein target radius]   ;; returns length 5 neighborhood about target          
   (let [ r                     (apply str (repeat radius '.))
          target-regex          (reduce str [r "[" target "]" r])
-	       neighborhood-sequence (re-seq (re-pattern target-regex) protein)]
+	 neighborhood-sequence (re-seq (re-pattern target-regex) protein)]
          neighborhood-sequence))
 
 (defn make [[a b _ c d]]       ; extracts features from the neighborhood  
