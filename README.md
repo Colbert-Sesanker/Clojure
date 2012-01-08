@@ -53,6 +53,7 @@ The two main functions are:
   The features of the hash-map are in the form on the RHS of `(1)` and two element combinations are computed 
   using the cartesian product in `clojure.contrib.combinatorics`. The hash-map, protein-neighborhood
   has 1848 key value pairs in the form: 
+
                                         {AL01 33, 2D 66, 1LL 1330, R2 1847, ...} 
 
   where the pairs are unordered.The a sparse feature vector in `R^1848` is constructed from each example. 
@@ -72,6 +73,7 @@ The two main functions are:
   how many X's were guessed correctly based on file `"C"`. The rest of the ordered elements correspond to the Xs in file `"B"`  
   the ith element of the sequence in `"D"` corresponds to the ith X in file `"B"`, indexed from left to right. Create an example
   output `"D"` by typing: 
+
                                    (com-pare "order.txt" "orderX.txt" "order.txt" "out.txt") 
 
   in the REPL. `out.txt` reads:
@@ -90,13 +92,18 @@ The two main functions are:
   * `"B"`: The learning statistics graphs for a given amino acid using Incanter
 
   try:  
+
                                                     (show-plots "A" "Anole.txt") 
+
 
  and compare to: 
                                                     (show-plots "G" "order.txt")
 
+
  after making ordered data via: 
+
                                         (order-protein 100 ["LRKDC" "YDEST" "ESGPI"] "order.txt")  
+
   
  The vector of models, model-matrix, (a vector of vectors) transforms the binary classification problem into 
  a 21 classifier problem. Notice the training of the models is intrinsically parallel.
