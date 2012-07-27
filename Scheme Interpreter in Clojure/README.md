@@ -7,7 +7,7 @@
     min-lisp->> : (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))
     clojure.lang.Ref@992fa5
     min-lisp->> : (fact 10)
-    8800
+    3628800
     min-lisp->> : exit
     bye
     nil
